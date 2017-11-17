@@ -23,7 +23,7 @@
       //Split the stream and hastag extraction
       //val hashTags = stream.flatMap(status => status.getText.split(" "))//.filter(_.startsWith("#")))
 
-      val topCounts60 = stream.map((_, 1)).reduceByKeyAndWindow(_ + _, Seconds(60))
+      val topCounts60 = stream.filter(_.getLang == "en").map(_.getText()).map((_, 1)).reduceByKeyAndWindow(_ + _, Seconds(60))
                        .map{case (topic, count) => (count, topic)}
                        .transform(_.sortByKey(false))
   
