@@ -1,0 +1,10 @@
+What's done:
+1)Streamed Twitter data using a query text
+2)Extracted only text part from twitter statuses
+3)GetTextUrl <- using JSoup extracts data froma given link/URL
+4)extracted text from paragraph
+
+next steps:
+1) extract link/URL from text and pass to GetTextUrl to get text from the linked web page
+2) cleaning (removal) of &lt; &gt; &nbsp;
+3) remove stopwords
