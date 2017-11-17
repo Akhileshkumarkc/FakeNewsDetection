@@ -15,7 +15,7 @@ object GetTextURL {
       val html = scala.io.Source.fromURL("https://en.wikipedia.org/wiki/Donald_Trump").mkString
     
       def processNode(node: Node){       
-        if(node.isInstanceOf[TextNode] && !node.toString().equals(" "))
+        if(node.isInstanceOf[TextNode] && !node.toString().equals(" ") && node.parentNode().nodeName().toString().equals("p"))
           println(node.toString())
         if(node.childNodeSize()>0)
           node.childNodes().asScala.foreach(x => processNode(x))
