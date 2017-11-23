@@ -1,0 +1,5 @@
+Find 3 JSON files
+
+processed_articles1 -> contains first 20000 processed articles
+processed_articles2 -> contains second 20000 processed articles
+processed_articles3 -> contains last 10000 processed articles
