@@ -1,4 +1,3 @@
-package Fakenews
 
 import org.apache.spark.sql.{SQLContext, SaveMode, SparkSession}
 import org.apache.spark.streaming.dstream.DStream
