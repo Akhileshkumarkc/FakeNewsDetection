@@ -37,7 +37,7 @@ import scala.util.control.Exception._
     }
     def main(args: Array[String]): Unit = {
       //setting up the configuration
-      val conf = new SparkConf().setAppName("Twitterstream").setMaster("local[2]")
+      val conf = new SparkConf().setAppName("Twitterstream").setMaster("local[4]")
       val sc = new SparkContext(conf)
       val filters = Seq("Trump")
        
@@ -48,7 +48,7 @@ import scala.util.control.Exception._
       System.setProperty("twitter4j.oauth.consumerSecret","JWREIWrENWcGt37FEyTPhfE34j4O1w6kkF02wCUhLB28blZ0nq")
       System.setProperty("twitter4j.oauth.accessToken", "899279922639675392-qWkTEtTiWJ6dYPrefliL21s2FkqWY6I")
       System.setProperty("twitter4j.oauth.accessTokenSecret", "K6rXIUlCMl7HUFYPIXvbgC14DY4LrLtgxjIbGh5aavZWN")
-      val stream = TwitterUtils.createStream(ssc, None,filters)
+      val stream = TwitterUtils.createStream(ssc, None,filters).filter(t => t.getLang()=="en")
       
       //extracting URL which is contained in tweets
       val urlTweets=stream.map(_.getURLEntities()).flatMap(arrayURL=>arrayURL.filter(_.getExpandedURL().length>0))
@@ -58,7 +58,14 @@ import scala.util.control.Exception._
         import spark.implicits._
         val tweetdf=value.toDF("tweeturl")
         tweetdf.createOrReplaceTempView("tweets")
-        val tweets=spark.sql("select tweeturl from tweets").foreach(row => println(getText(row.getString(0))))
+        val tweets=spark.sql("select tweeturl from tweets").foreach(row => {
+          try {
+            println(getText(row.getString(0)))
+          }
+          catch{
+            case e: Exception => println("interrupted")
+          }
+        })
         
       }
   
