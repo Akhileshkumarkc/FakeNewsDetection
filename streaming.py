@@ -5,6 +5,7 @@ import json
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
 import re
+import RealTimeFeatureExtraction
 
 
 def filterAndGetUrl(tweet):
@@ -47,18 +48,24 @@ def getUrlText(urls):
                 for p in paragraphs:                
                     text+=p.text+" "                   
                         
-                finaltext += re.sub('[^0-9a-zA-Z]+', ' ', text) + "\n" 
-                finalHeader += re.sub('[^0-9a-zA-Z]+', ' ', title) + "\n" 
+                finaltext += re.sub('[^0-9a-zA-Z]+', ' ', text) 
+                finalHeader += re.sub('[^0-9a-zA-Z]+', ' ', title)
         except:
             pass
     
     return [finalHeader,finaltext]
 
 def formText(text):    
-    retText = re.sub(r'RT.+:\s+', '', text)  
+    retText = re.sub(r'RT.+:\s+', '', text) 
+    retText = re.sub(r'https?\S+', '', retText)
     retText = re.sub('[^0-9a-zA-Z]+', ' ', retText)
-    retText = re.sub(r'https?:\/\/.*[\r\n]*', '', retText)
+    
     return retText
+
+def filterIfURL(tweetList):
+    if (tweetList[1][0] == "" or tweetList[1][1] == ""):
+        return False
+    return True
 
 if __name__ == "__main__":
 
@@ -76,7 +83,9 @@ if __name__ == "__main__":
     parsed = kafkaStream.map(lambda v: json.loads(v[1]))
 
     
-    urls = parsed.filter(filterAndGetUrl).map(lambda tweet : [formText(tweet['text']),getUrlText(tweet['entities']["urls"])])
+    urls = parsed.filter(filterAndGetUrl) \
+    .map(lambda tweet : [formText(tweet['text']),getUrlText(tweet['entities']["urls"])]) \
+    .filter(filterIfURL).map( lambda x : RealTimeFeatureExtraction.extractFeatures(title=x[1][0], body=x[1][1]))
 
 	#Print the User tweet counts
     urls.pprint()
